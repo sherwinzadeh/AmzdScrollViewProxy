@@ -7,11 +7,6 @@ import Combine
 
 // MARK: Fix for name collision when using SwiftUI 2.0
 
-@available(iOS 13.0, OSX 10.15, tvOS 13.0, watchOS 6.0, *)
-public typealias AmzdScrollViewProxy = ScrollViewProxy
-@available(iOS 13.0, OSX 10.15, tvOS 13.0, watchOS 6.0, *)
-public typealias AmzdScrollViewReader = ScrollViewReader
-
 // MARK: Platform specifics
 
 #if os(macOS)
@@ -79,23 +74,23 @@ extension UIEdgeInsets {
 
 @available(iOS 13.0, OSX 10.15, tvOS 13.0, watchOS 6.0, *)
 extension ScrollView {
-    /// Creates a ScrollView with a ScrollViewReader
-    public init<ProxyContent: View>(_ axes: Axis.Set = .vertical, showsIndicators: Bool = true, @ViewBuilder content: @escaping (ScrollViewProxy) -> ProxyContent) where Content == ScrollViewReader<ProxyContent> {
+    /// Creates a ScrollView with a AmzdScrollViewReader
+    public init<ProxyContent: View>(_ axes: Axis.Set = .vertical, showsIndicators: Bool = true, @ViewBuilder content: @escaping (AmzdScrollViewProxy) -> ProxyContent) where Content == AmzdScrollViewReader<ProxyContent> {
         self.init(axes, showsIndicators: showsIndicators, content: {
-            ScrollViewReader(content: content)
+            AmzdScrollViewReader(content: content)
         })
     }
 }
 
 @available(iOS 13.0, OSX 10.15, tvOS 13.0, watchOS 6.0, *)
 extension View {
-    /// Adds an ID to this view so you can scroll to it with `ScrollViewProxy.scrollTo(_:alignment:animated:)`
+    /// Adds an ID to this view so you can scroll to it with `AmzdScrollViewProxy.scrollTo(_:alignment:animated:)`
     public func scrollId<ID: Hashable>(_ id: ID) -> some View {
         modifier(ScrollViewProxyPreferenceModifier(id: id))
     }
     
-    @available(swift, obsoleted: 1.0, renamed: "scrollId(_:)")
-    public func id<ID: Hashable>(_ id: ID, scrollView: ScrollViewProxy) -> some View { self }
+//    @available(swift, obsoleted: 1.0, renamed: "scrollId(_:)")
+//    public func id<ID: Hashable>(_ id: ID, scrollView: AmzdScrollViewProxy) -> some View { self }
 }
 
 // MARK: Preferences
@@ -131,15 +126,15 @@ struct ScrollViewProxyPreferenceModifier: ViewModifier {
     }
 }
 
-// MARK: ScrollViewReader
+// MARK: AmzdScrollViewReader
 
 @available(iOS 13.0, OSX 10.15, tvOS 13.0, watchOS 6.0, *)
-public struct ScrollViewReader<Content: View>: View {
-    private var content: (ScrollViewProxy) -> Content
+public struct AmzdScrollViewReader<Content: View>: View {
+    private var content: (AmzdScrollViewProxy) -> Content
 
-    @State private var proxy = ScrollViewProxy()
+    @State private var proxy = AmzdScrollViewProxy()
     
-    public init(@ViewBuilder content: @escaping (ScrollViewProxy) -> Content) {
+    public init(@ViewBuilder content: @escaping (AmzdScrollViewProxy) -> Content) {
         self.content = content
     }
 
@@ -170,7 +165,7 @@ public struct ScrollViewReader<Content: View>: View {
 public typealias OffsetPublisher = AnyPublisher<CGPoint, Never>
 
 @available(iOS 13.0, OSX 10.15, tvOS 13.0, watchOS 6.0, *)
-public struct ScrollViewProxy {
+public struct AmzdScrollViewProxy {
     fileprivate class Coordinator {
         var frames = [AnyHashable: CGRect]()
         weak var scrollView: PlatformScrollView?
